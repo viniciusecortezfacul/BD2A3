@@ -1,14 +1,15 @@
 create database novo character set = utf8;
 use novo;
-
+/*Não deixar nada por padrão sempre colocar 
+*/
 
 create table tblProprietario(
-	strNome varchar(50),
-	strCpf char(11),
-	dateNasc date, 
-	pkProprietario integer,
-	primary key(pkProprietario)
-	);
+	strNome varchar(50) not null,
+	strCpf char(11)  not null,
+	dateNasc date not null, 
+	pkProprietario integer not null primary key auto_increment,
+	strObservacao varchar(200) null
+	) IENGINE ;
 	
 	
 create table tblPet(
