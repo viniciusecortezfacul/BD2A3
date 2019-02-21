@@ -1,4 +1,4 @@
-create database novo;
+create database novo character set = utf8;
 use novo;
 
 
@@ -16,5 +16,6 @@ create table tblPet(
 	strEspecie varchar(50),
 	strRga varchar(20),
 	pkPet integer,
-	
+	fkProprietario integer,
+	foreign key (fkProprietario) references tblProprietario(pkProprietario)
 );
