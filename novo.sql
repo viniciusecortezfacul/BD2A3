@@ -14,4 +14,12 @@ CREATE TABLE tblpet(
 	pkPet INTEGER NOT NULL PRIMARY KEY auto_increment,
 	strRga varchar(50),
 	strNome varchar(100)
-);
+) ENGINE innoDB character set = utf8;
+
+
+CREATE TABLE relproprietario(
+	fkProprietario INTEGER NOT NULL,
+	fkPet INTEGER NOT NULL,
+	FOREIGN KEY (fkProprietario) REFERENCES tblproprietario(pkProprietario),
+	FOREIGN KEY (fkPet) REFERENCES tblpet(pkPet)
+)ENGINE innoDB character set = utf8;
