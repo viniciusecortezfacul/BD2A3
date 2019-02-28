@@ -1,5 +1,5 @@
-create database novo character set = utf8;
-use novo;
+create database revisao character set = utf8;
+use revisao;
 /*Não deixar nada por padrão sempre colocar 
 */
 create table tblproprietario(
@@ -10,4 +10,8 @@ create table tblproprietario(
 	strObservacao varchar(200) null
 	) ENGINE innoDB character set = utf8;
 
---INSERT
+CREATE TABLE tblpet(
+	pkPet INTEGER NOT NULL PRIMARY KEY auto_increment,
+	strRga varchar(50),
+	strNome varchar(100)
+);
