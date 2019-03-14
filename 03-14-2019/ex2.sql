@@ -8,12 +8,11 @@ CREATE TABLE tblestado(
 ) ENGINE = MyISAM CHARACTER SET = utf8 ;
 CREATE TABLE tblcidade(
     pkCidade integer primary key not null ,
-    strNome varchar(60) not null, 
-    strBairro varchar(80),
+    strNome varchar(60) not null
 )ENGINE = MyISAM CHARACTER SET = utf8;
 
 CREATE TABLE relestadocidade(
-    pkRel integer primary key auto_increment ,
+    pkRel integer primary key ,
     fkEstado integer not null,
     fkCidade integer not null,
     foreign key (fkEstado) references tblestado(pkEstados),
@@ -43,6 +42,3 @@ CREATE TABLE relcepestado(
     foreign key(fkEstado) references tblestado(pkEstados),
     unique(fkCEP)
 )ENGINE = MyISAM CHARACTER SET = utf8;
-
-
-LOAD DATA INFILE 'C:/ProgramData/MySQL Server 8.0/Uploads/cities.csv' INTO TABLE [tabela] FIELDS TERMINATED BY ',' (...);
