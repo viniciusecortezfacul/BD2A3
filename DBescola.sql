@@ -1,21 +1,25 @@
-CREATE DATABASE dbModelo;
-USE dbModelo;
+CREATE DATABASE dbEscola;
+USE dbEscola;
 
 CREATE TABLE tblestudante(
+	upkEstudante binary(16) not null,
     pkChave integer not null primary key auto_increment,
     dcCreated DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, 
     dcModified DATETIME NULL ON UPDATE CURRENT_TIMESTAMP,
-    strProntuario char(9) unique,
+    strProntuario char(7) unique,
     strNome varchar(50),
     dtNascimento date
 )ENGINE = InnoDB CHARACTER SET = utf8;
 
 CREATE TABLE tblturma(
+	upkTurma binary(16) not null,
     dcCreated DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, 
     dcModified DATETIME NULL ON UPDATE CURRENT_TIMESTAMP,
     pkChave integer not null primary key auto_increment,
     strDia varchar(6) not null,
-    strPeriodo varchar(6) not null
+    strPeriodo varchar(6) not null,
+	dia enum( "SEGUNDA", "TERCA", "QUARTA", "QUINTA", "SEXTA", "SABADO"," DOMINGO") ,
+	pediodo enum("MATUTINO", "VESPERTINO", "NOTURNO") 
 )ENGINE = InnoDB CHARACTER SET = utf8;
 
 
@@ -32,11 +36,12 @@ CREATE TABLE relestudanteturma(
 
 
 CREATE TABLE tbldisciplina(
+	upkDisciplina binary(16) not null,
+	strNome varchar(50),
     dcCreated DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, 
     dcModified DATETIME NULL ON UPDATE CURRENT_TIMESTAMP,
     pkChave integer not null primary key auto_increment,
-    strSigla char(5) not null unique,
-    strEscolaridade varchar(20) null
+    strSigla char(5) not null unique
 )ENGINE = InnoDB CHARACTER SET = utf8;
 
 CREATE TABLE reldisciplinaturma(
@@ -51,12 +56,13 @@ CREATE TABLE reldisciplinaturma(
 )ENGINE = InnoDB CHARACTER SET = utf8;
 
 CREATE TABLE tbldocente(
+	upkDocente binary(16) not null,
     dcCreated DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, 
     dcModified DATETIME NULL ON UPDATE CURRENT_TIMESTAMP,
     pkChave INTEGER NOT NULL PRIMARY KEY auto_increment,
     strProntuario char(9) not null unique,
     strNome varchar(50) not null,
-    strEscolaridade varchar(20) not null, 
+	escolaridade enum("FUNDAMENTAL", "MEDIO", "TECNOLOGO", "BACHARELADO", "LICENCIATURA", "MESTRADO", "DOUTORADO", "POSGRADUACAO","LIVREDOCENCIA" ),
     dtNascimento date
 )ENGINE = InnoDB CHARACTER SET = utf8;
 
@@ -97,12 +103,48 @@ CREATE FUNCTION fnNovaChave() RETURNS BINARY(16) DETERMINISTIC
 	RETURN UNHEX(REPLACE(UUID(), '-', ''));
 	
 DELIMITER //	
-CREATE PROCEDURE prCadastrarDocente (OUT varProntuario varchar(9), varNome varchar(50), varEscolaridade varchar(10), varNascimento date)
+CREATE PROCEDURE prCriarDocente ( varProntuario varchar(9), varNome varchar(50),  varNascimento date,  
+				varEscolaridade enum("FUNDAMENTAL", "MEDIO", "TECNOLOGO", "BACHARELADO", "LICENCIATURA", "MESTRADO", "DOUTORADO", "POSGRADUACAO","LIVREDOCENCIA" ))
 	BEGIN
-		START TRANSACTION
-			INSERT INTO tbldocente(upkDocente, strProntuario, strNome, strEscolaridade, dtNascimento) values (fnNovaChave(), varProntuario, varNome, varEscolaridade, varNascimento);
-
-			COMMIT;
-		END //
-		
+		START TRANSACTION;
+			INSERT INTO tbldocente(upkDocente, strProntuario, strNome, escolaridade, dtNascimento) values (fnNovaChave(), varProntuario, varNome, varEscolaridade, varNascimento);
+		COMMIT;
+	END //
 DELIMITER;
+
+DELIMITER //	
+
+
+
+CREATE PROCEDURE prCriarEstudante ( varProntuario varchar(7), varNome varchar(50),  varNascimento date)
+	BEGIN
+		START TRANSACTION;
+			INSERT INTO tbldocente(upkDocente, strProntuario, strNome, escolaridade, dtNascimento) values (fnNovaChave(), varProntuario, varNome, varNascimento);
+		COMMIT;
+	END //
+DELIMITER;
+
+CREATE PROCEDURE prAtualizarEstudante ( varProntuario varchar(7), varNome varchar(50),  varNascimento date)
+	BEGIN
+		START TRANSACTION;
+			UPDATE tblestudante set strProntuario = varProntuario, strNome = varNome, dtNascimento = varNascimento WHERE strProntuario = varProntuario;
+		COMMIT;
+	END //
+DELIMITER;
+
+
+
+CREATE PROCEDURE prLerEstudante ( varProntuario varchar(7))
+	BEGIN
+		START TRANSACTION;
+			SELECT dcCreated as "data de criação" dcModified as "data de modificação", strProntuario as prontuario, 
+					strNome as nome, dtNascimento as "data de nascimento";
+		COMMIT;
+	END //
+DELIMITER;
+
+
+
+
+
+
