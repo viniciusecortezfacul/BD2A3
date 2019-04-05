@@ -60,7 +60,7 @@ CREATE TABLE tbldocente(
     dcCreated DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, 
     dcModified DATETIME NULL ON UPDATE CURRENT_TIMESTAMP,
     pkChave INTEGER NOT NULL PRIMARY KEY auto_increment,
-    strProntuario char(9) not null unique,
+    strProntuario char(7) not null unique,
     strNome varchar(50) not null,
 	escolaridade enum("FUNDAMENTAL", "MEDIO", "TECNOLOGO", "BACHARELADO", "LICENCIATURA", "MESTRADO", "DOUTORADO", "POSGRADUACAO","LIVREDOCENCIA" ),
     dtNascimento date
@@ -88,7 +88,7 @@ INSERT INTO tblestudante(strProntuario, strNome, dtNascimento) values ("SP300303
 
 
 
-INSERT INTO tbldocente(strProntuario, strNome, strEscolaridade ,dtNascimento) values ("SP3003032", "Irineu", "doutor","1999-10-23");
+
 
 INSERT INTO tbldisciplina(strSigla) values ("BD2A3");
 INSERT INTO tblturma(strDia, strPeriodo) values ("SEG", "3");
@@ -103,45 +103,62 @@ CREATE FUNCTION fnNovaChave() RETURNS BINARY(16) DETERMINISTIC
 	RETURN UNHEX(REPLACE(UUID(), '-', ''));
 	
 DELIMITER //	
-CREATE PROCEDURE prCriarDocente ( varProntuario varchar(9), varNome varchar(50),  varNascimento date,  
+CREATE PROCEDURE prCriarDocente ( varProntuario char(7), varNome varchar(50),  varNascimento date,  
 				varEscolaridade enum("FUNDAMENTAL", "MEDIO", "TECNOLOGO", "BACHARELADO", "LICENCIATURA", "MESTRADO", "DOUTORADO", "POSGRADUACAO","LIVREDOCENCIA" ))
 	BEGIN
 		START TRANSACTION;
 			INSERT INTO tbldocente(upkDocente, strProntuario, strNome, escolaridade, dtNascimento) values (fnNovaChave(), varProntuario, varNome, varEscolaridade, varNascimento);
 		COMMIT;
 	END //
-DELIMITER;
+DELIMITER ;
 
 DELIMITER //	
 
-
-
-CREATE PROCEDURE prCriarEstudante ( varProntuario varchar(7), varNome varchar(50),  varNascimento date)
+CREATE PROCEDURE prCriarEstudante ( varProntuario char(7), varNome varchar(50),  varNascimento date)
 	BEGIN
 		START TRANSACTION;
-			INSERT INTO tbldocente(upkDocente, strProntuario, strNome, escolaridade, dtNascimento) values (fnNovaChave(), varProntuario, varNome, varNascimento);
+			INSERT INTO tbldocente(upkDocente, strProntuario, strNome, dtNascimento) values (fnNovaChave(), varProntuario, varNome, varNascimento);
 		COMMIT;
 	END //
-DELIMITER;
+DELIMITER ;
 
-CREATE PROCEDURE prAtualizarEstudante ( varProntuario varchar(7), varNome varchar(50),  varNascimento date)
+
+DELIMITER //
+CREATE PROCEDURE prAtualizarEstudante ( varProntuario char(7), varNome varchar(50),  varNascimento date)
 	BEGIN
 		START TRANSACTION;
 			UPDATE tblestudante set strProntuario = varProntuario, strNome = varNome, dtNascimento = varNascimento WHERE strProntuario = varProntuario;
 		COMMIT;
 	END //
-DELIMITER;
+DELIMITER ;
 
 
-
-CREATE PROCEDURE prLerEstudante ( varProntuario varchar(7))
+DELIMITER //
+CREATE PROCEDURE prLerEstudante ( varProntuario char(7))
 	BEGIN
 		START TRANSACTION;
-			SELECT dcCreated as "data de criação" dcModified as "data de modificação", strProntuario as prontuario, 
+			SELECT dcCreated as "data de criação", dcModified as "data de modificação", strProntuario as prontuario, 
 					strNome as nome, dtNascimento as "data de nascimento";
 		COMMIT;
 	END //
-DELIMITER;
+DELIMITER ;
+
+
+DELIMITER //
+CREATE PROCEDURE prListarEstudante()
+	BEGIN
+		START TRANSACTION;
+			SELECT dcCreated as "data de criação", dcModified as 
+					"data de modificação", strProntuario as "prontuario", strNome as "nome", 
+					dtNascimento as "data de nascimento"
+					where tblestudante;
+		COMMIT;
+	END //
+DELIMITER ;
+
+
+CREATE USER 'secretaria'@'localhost' IDENTIFIED BY 'senha';
+GRANT ALL ON dbEscola.* TO 'secretaria'@'localhost';
 
 
 
