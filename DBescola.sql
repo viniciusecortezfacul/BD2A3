@@ -16,8 +16,6 @@ CREATE TABLE tblturma(
     dcCreated DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, 
     dcModified DATETIME NULL ON UPDATE CURRENT_TIMESTAMP,
     pkChave integer not null primary key auto_increment,
-    strDia varchar(6) not null,
-    strPeriodo varchar(6) not null,
 	dia enum( "SEGUNDA", "TERCA", "QUARTA", "QUINTA", "SEXTA", "SABADO"," DOMINGO") ,
 	pediodo enum("MATUTINO", "VESPERTINO", "NOTURNO") 
 )ENGINE = InnoDB CHARACTER SET = utf8;
@@ -117,7 +115,7 @@ DELIMITER //
 CREATE PROCEDURE prCriarEstudante ( varProntuario char(7), varNome varchar(50),  varNascimento date)
 	BEGIN
 		START TRANSACTION;
-			INSERT INTO tbldocente(upkDocente, strProntuario, strNome, dtNascimento) values (fnNovaChave(), varProntuario, varNome, varNascimento);
+			INSERT INTO tblestudante(upkEstudante, strProntuario, strNome, dtNascimento) values (fnNovaChave(), varProntuario, varNome, varNascimento);
 		COMMIT;
 	END //
 DELIMITER ;
@@ -137,8 +135,8 @@ DELIMITER //
 CREATE PROCEDURE prLerEstudante ( varProntuario char(7))
 	BEGIN
 		START TRANSACTION;
-			SELECT dcCreated as "data de criação", dcModified as "data de modificação", strProntuario as prontuario, 
-					strNome as nome, dtNascimento as "data de nascimento";
+			SELECT dcCreated as "criado", dcModified as "modificado", strProntuario as "prontuario", 
+					strNome as "nome", dtNascimento as "nascimento" from tblestudante;
 		COMMIT;
 	END //
 DELIMITER ;
@@ -148,19 +146,54 @@ DELIMITER //
 CREATE PROCEDURE prListarEstudante()
 	BEGIN
 		START TRANSACTION;
-			SELECT dcCreated as "data de criação", dcModified as 
-					"data de modificação", strProntuario as "prontuario", strNome as "nome", 
-					dtNascimento as "data de nascimento"
-					where tblestudante;
+			SELECT dcCreated as "criado", dcModified as 
+					"modificado", strProntuario as "prontuario", strNome as "nome", 
+					dtNascimento as "nascimento"
+					from tblestudante;
+		COMMIT;
+	END //
+DELIMITER ;
+DELIMITER //
+CREATE PROCEDURE prCriarDisciplina ( varSigla char(5), varNome varchar(50))
+	BEGIN
+		START TRANSACTION;
+			INSERT INTO tbldisciplina (upkDisciplina, strSigla  ,strNome ) values (fnNovaChave(), varSigla, varNome);
 		COMMIT;
 	END //
 DELIMITER ;
 
+DELIMITER //
+CREATE PROCEDURE prCriarTurma( varSigla char(5), varDia enum( "SEGUNDA", "TERCA", "QUARTA", "QUINTA", "SEXTA", "SABADO"," DOMINGO") , varPeriodo enum("MATUTINO", "VESPERTINO", "NOTURNO") )
+	BEGIN
+		START TRANSACTION;
+			INSERT INTO tblturma (upkTurma, periodo, dia)  values (fnNovaChave(), varDia, varPeriodo);
+			INSERT INTO reldisciplinaturma(upkTurma, fkTurma, fkDisciplina) SELECT fnNovaChave(), LAST_INSERT_ID, fkDisciplina from tbldisciplina where strSigla = varSigla; 						
+		COMMIT ;
+	END//
+DEMILITER;
+
+
+DELIMITER //
+CREATE PROCEDURE prListarDisciplina()
+	BEGIN
+		START TRANSACTION;
+			SELECT dcCreated as "criado", dcModified as "modificado", strSigla as "sigla", strNome as "nome" from tbldisciplina;
+		COMMIT ;
+	END//
+DEMILITER;
+
+DELIMITER //
+CREATE PROCEDURE prListarDocente()
+	BEGIN
+		START TRANSACTION;
+			SELECT dcCreated as "criado", dcModified as "modificado", strProntuario as "prontuario", strNome as "nome" , escolaridade, dtNascimento as "nascimento"   from tbldisciplina;
+		COMMIT ;
+	END//
 
 CREATE USER 'secretaria'@'localhost' IDENTIFIED BY 'senha';
 GRANT ALL ON dbEscola.* TO 'secretaria'@'localhost';
 
-
+show procedure status like "pr%";
 
 
 
