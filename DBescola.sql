@@ -186,7 +186,7 @@ DELIMITER //
 CREATE PROCEDURE prListarDocente()
 	BEGIN
 		START TRANSACTION;
-			SELECT dcCreated as "criado", dcModified as "modificado", strProntuario as "prontuario", strNome as "nome" , escolaridade, dtNascimento as "nascimento"   from tbldisciplina;
+			SELECT dcCreated as "criado", dcModified as "modificado", strProntuario as "prontuario", strNome as "nome" , escolaridade, dtNascimento as "nascimento"   from tbldocente;
 		COMMIT ;
 	END//
 
